@@ -100,8 +100,7 @@ public class PlotDrawer extends JFrame {
                 super.mouseClicked(e);
                 Axis axisX = plot.getAxis(XYPlot.AXIS_X);
                 Axis axisY = plot.getAxis(XYPlot.AXIS_Y);
-//                Number numberX = plot.getAxisRenderer(XYPlot.AXIS_X).viewToWorld(axisX, e.getX(), true);
-//                Number numberY = plot.getAxisRenderer(XYPlot.AXIS_Y).viewToWorld(axisY, e.getY(), true);
+
                 double X = getXCoordinateForBounds(e.getX(), axisX.getMin().doubleValue(), axisX.getMax().doubleValue());
                 double Y = getYCoordinateForBounds(e.getY(), axisY.getMin().doubleValue(), axisY.getMax().doubleValue());
                 drawPath(new ComplexDouble(X, Y));

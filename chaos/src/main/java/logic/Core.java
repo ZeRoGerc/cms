@@ -3,6 +3,7 @@ package logic;
 import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Core {
@@ -11,7 +12,7 @@ public class Core {
 
     public static final int ITERATIONS = 10000;
 
-    public static final int STEPS = 128;
+    public static final int STEPS = 100;
 
     public static double f(double r, double x) {
         return r * x * (1 - x);
@@ -33,36 +34,67 @@ public class Core {
             currentY += step;
         }
 
-        return result;
+        return retainUnique(result);
     }
 
     @NotNull
-    public static List<Double> findConvergeSeries(double r) {
-        double current = 0.5;
+    public static List<Double> findConvergeSeries(double start, double r) {
+        double current = start;
 
         List<Double> result = new ArrayList<>();
         result.add(current);
 
-        int cycleLength = 1;
-        while (cycleLength <= ITERATIONS) {
-            double comp = current;
-            for (int i = 0; i < cycleLength; i++) {
-                current = f(r, current);
-                if (equals(comp, current)) {
-                    break;
-                }
-                result.add(current);
+        double comp = current;
+        for (int i = 0; i < ITERATIONS; i++) {
+            current = f(r, current);
+
+            if (equals(comp, current)) {
+                break;
             }
-            cycleLength *= 2;
+
+            if ((i & (i - 1)) == 0) {
+                comp = current;
+            }
+
+            result.add(current);
         }
         return result;
     }
 
     private static double iteratePoint(double r, double currentY) {
         double result = currentY;
-        for (int i = 0; i < ITERATIONS; i++) {
+
+        double comp = result;
+
+        for (int i = 1; i < ITERATIONS; i++) {
             result = f(r, result);
+
+            if (equals(result, comp)) {
+                break;
+            }
+
+            if ((i & (i - 1)) == 0) {
+                comp = result;
+            }
         }
         return result;
+    }
+
+    /**
+     * Warning: This method will sort given list!
+     */
+    @NotNull
+    private static List<Double> retainUnique(@NotNull List<Double> list) {
+        Collections.sort(list);
+
+        List<Double> unique = new ArrayList<>();
+        unique.add(list.get(0));
+        for (int i = 1; i < list.size(); i++) {
+            if (!equals(list.get(i), unique.get(unique.size() - 1))) {
+                unique.add(list.get(i));
+            }
+        }
+
+        return unique;
     }
 }

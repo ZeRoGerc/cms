@@ -100,14 +100,24 @@ public class PlotDrawer extends JFrame {
                 super.mouseClicked(e);
                 Axis axisX = plot.getAxis(XYPlot.AXIS_X);
                 Axis axisY = plot.getAxis(XYPlot.AXIS_Y);
-                Number numberX = plot.getAxisRenderer(XYPlot.AXIS_X).viewToWorld(axisX, e.getX(), true);
-                Number numberY = plot.getAxisRenderer(XYPlot.AXIS_Y).viewToWorld(axisY, e.getY(), true);
-                double X = numberX.doubleValue();
-                double Y = -numberY.doubleValue();
+//                Number numberX = plot.getAxisRenderer(XYPlot.AXIS_X).viewToWorld(axisX, e.getX(), true);
+//                Number numberY = plot.getAxisRenderer(XYPlot.AXIS_Y).viewToWorld(axisY, e.getY(), true);
+                double X = getXCoordinateForBounds(e.getX(), axisX.getMin().doubleValue(), axisX.getMax().doubleValue());
+                double Y = getYCoordinateForBounds(e.getY(), axisY.getMin().doubleValue(), axisY.getMax().doubleValue());
                 drawPath(new ComplexDouble(X, Y));
                 getContentPane().repaint();
             }
         });
+    }
+
+    public double getXCoordinateForBounds(int pix, double left, double right) {
+        double len = right - left;
+        return left + len * ((double) pix / getContentPane().getWidth());
+    }
+
+    public double getYCoordinateForBounds(int pix, double left, double right) {
+        double len = right - left;
+        return right - len * ((double) pix / getContentPane().getHeight());
     }
 
     private void updatedDataForConstraints(double x1, double y1, double x2, double y2) {
@@ -125,7 +135,7 @@ public class PlotDrawer extends JFrame {
                 try {
                     updateUI(get());
                 } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                    // Just ignore here. Because it's the case when we interrupt task ourself
                 }
             }
         };
@@ -151,7 +161,6 @@ public class PlotDrawer extends JFrame {
         firstRootPoints.clear();
         secondRootPoints.clear();
         thirdRootPoints.clear();
-
 
         for (Pair<ComplexDouble, Root> cPoint : newPoints) {
             switch (cPoint.snd) {
